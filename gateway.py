@@ -7,7 +7,6 @@
 #
 
 import sys
-
 import flask
 import requests
 
@@ -15,13 +14,22 @@ app = flask.Flask(__name__)
 app.config.from_envvar('APP_CONFIG')
 
 upstream = app.config['UPSTREAM']
+users = app.config['USERS']
+users_endpoints = app.config['USERS_ENDPOINTS']
 
+# Start of round robin cycle attempt
+def route_handler(path):
+    if flask.request.path in user_endpoints:
+        next(users) + flask.request.path
+    else:
+        flask.abort(400, status="Bad Request")
 
 @app.errorhandler(404)
 def route_page(err):
 
     try:
         response = requests.request(
+            route_handler(flask.request.path),
             flask.request.method,
             upstream + flask.request.full_path,
             data=flask.request.get_data(),

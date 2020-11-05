@@ -1,7 +1,7 @@
 .PHONY: clean
 
-mockroblog.db:
-	sqlite3 mockroblog.db < mockroblog.sql
+schema.db:
+	sqlite3 schema.db < schema.sql
 
 clean:
-	rm -f mockroblog.db
+	rm -f schema.db
