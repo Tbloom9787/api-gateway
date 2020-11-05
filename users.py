@@ -73,7 +73,7 @@ def createUser():
         response.headers["Content-Type"] = "application/json; charset=utf-8"
         return response
 
-@app.route('/authenticate', methods=['GET'])
+@app.route('/authenticate', methods=['POST'])
 def authenticateUser():
     try:
         query_params = request.get_json()

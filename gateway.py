@@ -10,6 +10,7 @@ import sys
 import flask
 import requests
 from itertools import cycle
+from flask_basicauth import BasicAuth
 
 app = flask.Flask(__name__)
 app.config.from_envvar('APP_CONFIG')
@@ -22,6 +23,19 @@ users_endpoints = app.config['USERS_ENDPOINTS']
 timelines = cycle(app.config['TIMELINES'])
 timelines_endpoints = app.config['TIMELINES_ENDPOINTS']
 
+# Override of check_credentials for custom authentication with route
+def over_check_credentials(self, user, pass):
+    response = requests.post((next(users) + '/authenticate'), json={'username': user, 'pass': pass})
+
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+
+BasicAuth.check_credentials = over_check_credentials
+
+basic_auth = BasicAuth(app)
+
 # Start of round robin cycle attempt
 def route_handler(path):
     if path in user_endpoints:
@@ -31,9 +45,9 @@ def route_handler(path):
     else:
         flask.abort(400, status="Bad Request")
 
+@basic_auth.required
 @app.errorhandler(404)
 def route_page(err):
-
     try:
         response = requests.request(
             route_handler(flask.request.path),
