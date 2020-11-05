@@ -9,16 +9,17 @@
 import sys
 import flask
 import requests
+from itertools import cycle
 
 app = flask.Flask(__name__)
 app.config.from_envvar('APP_CONFIG')
 
 upstream = app.config['UPSTREAM']
 
-users = app.config['USERS']
+users = cycle(app.config['USERS'])
 users_endpoints = app.config['USERS_ENDPOINTS']
 
-timelines = app.config['TIMELINES']
+timelines = cycle(app.config['TIMELINES'])
 timelines_endpoints = app.config['TIMELINES_ENDPOINTS']
 
 # Start of round robin cycle attempt
