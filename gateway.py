@@ -14,13 +14,19 @@ app = flask.Flask(__name__)
 app.config.from_envvar('APP_CONFIG')
 
 upstream = app.config['UPSTREAM']
+
 users = app.config['USERS']
 users_endpoints = app.config['USERS_ENDPOINTS']
 
+timelines = app.config['TIMELINES']
+timelines_endpoints = app.config['TIMELINES_ENDPOINTS']
+
 # Start of round robin cycle attempt
 def route_handler(path):
-    if flask.request.path in user_endpoints:
-        next(users) + flask.request.path
+    if path in user_endpoints:
+        return next(users) + path
+    elif path in timelines_endpoints:
+        return next(timelines) + path
     else:
         flask.abort(400, status="Bad Request")
 
